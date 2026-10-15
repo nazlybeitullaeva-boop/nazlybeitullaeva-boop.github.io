@@ -381,7 +381,7 @@ section[id],article[id]{scroll-margin-top:84px}
 </section>
 
 <section class="sec in" id="cases" aria-labelledby="cases-h">
-  <div class="sh"><h2 id="cases-h">Проекты</h2><p>Концепт-проекты под реальный процесс записи онлайн-академии и демо под типичную задачу заказчика с фриланса. Каждый можно открыть и пройти. Данные условные.</p></div>
+  <div class="sh"><h2 id="cases-h">Проекты</h2><p>Концепт-проекты под реальные процессы: запись в онлайн-академию и сбор заявок для агентства недвижимости. Каждый можно открыть и пройти. Данные условные.</p></div>
 
   <article class="case">
     <div class="ctext">
@@ -440,12 +440,12 @@ section[id],article[id]{scroll-margin-top:84px}
 
   <article class="case">
     <div class="ctext">
-      <div class="chips"><span class="chip c">Telegram · VK · MAX</span><span class="chip">Node.js</span><span class="chip">Демо под типичную задачу</span></div>
-      <h3>LeadBot: заявки и файлы в трёх мессенджерах</h3>
+      <div class="chips"><span class="chip c">Telegram · VK · MAX</span><span class="chip">Node.js</span><span class="chip">Недвижимость</span></div>
+      <h3>Квартирный гид: заявки из трёх мессенджеров</h3>
       <dl>
-        <div><dt>Задача</dt><dd>Типичный заказ с фриланса: боты в Telegram, VK и MAX собирают контакты и в ответ присылают файл, а файлов несколько, по разным направлениям.</dd></div>
-        <div><dt>Решение</dt><dd>Человек выбирает направление, оставляет имя и телефон и сразу получает PDF. Заявка сохраняется в CSV и приходит менеджеру в Telegram. Сценарий написан один раз, для каждого мессенджера свой тонкий адаптер, поэтому правка сразу работает везде.</dd></div>
-        <div><dt>Ещё умеет</dt><dd>Два режима без правки кода: один бот с выбором темы или отдельный бот на каждое направление. Повторно пришедший человек получает файл без анкеты. Согласие по 152-ФЗ, защита от подстановки чужого контакта, кэш файлов в VK и MAX.</dd></div>
+        <div><dt>Сценарий</dt><dd>Агентство недвижимости раздаёт полезные гиды в обмен на контакты: по ипотеке, новостройкам и продаже квартиры. Клиенты пишут в Telegram, VK и MAX, и ни одна заявка не должна потеряться.</dd></div>
+        <div><dt>Решение</dt><dd>Человек выбирает тему, оставляет имя и телефон и сразу получает PDF-гид. Заявка сохраняется в таблицу и приходит менеджеру в Telegram. Сценарий написан один раз, для каждого мессенджера свой тонкий адаптер, поэтому правка сразу работает везде.</dd></div>
+        <div><dt>Ещё умеет</dt><dd>Два режима без правки кода: один бот с выбором темы или отдельный бот на каждую тему. Повторно пришедший человек получает файл без анкеты. Согласие по 152-ФЗ, защита от подстановки чужого контакта, кэш файлов в VK и MAX.</dd></div>
         <div><dt>Стек</dt><dd>Node.js, grammY, vk-io, @maxhub/max-bot-api, dotenv, node:test. Заявки в CSV, без базы данных.</dd></div>
       </dl>
       <div class="nums"><div><b>3</b><span>мессенджера</span></div><div><b>1</b><span>сценарий на все</span></div><div><b>5/5</b><span>автотестов проходят</span></div></div>
@@ -458,14 +458,14 @@ section[id],article[id]{scroll-margin-top:84px}
       <div class="flow" aria-hidden="true"><i></i></div>
       <div class="core">
         <div class="ph"><b>Один сценарий</b><span id="adapter">адаптер: Telegram</span></div>
-        <div class="path"><span>/start</span><em>→</em><span>Маркетинг</span><em>→</em><span>Имя</span><em>→</em><span class="var" id="phoneStep">Кнопка «Отправить номер»</span></div>
+        <div class="path"><span>/start</span><em>→</em><span>Ипотека</span><em>→</em><span>Имя</span><em>→</em><span class="var" id="phoneStep">Кнопка «Отправить номер»</span></div>
         <div class="norm"><s id="rawPhone">8 (999) 123-45-67</s><span>→</span><b>+79991234567</b></div>
         <p class="note" id="msgrNote">В Telegram и MAX номер отправляется одной кнопкой.</p>
       </div>
       <div class="flow" aria-hidden="true"><i></i></div>
       <div class="outs">
-        <div><b>PDF</b><span>файл по выбранной теме</span></div>
-        <div><b>CSV</b><span>строка с заявкой</span></div>
+        <div><b>PDF</b><span>гид по выбранной теме</span></div>
+        <div><b>Таблица</b><span>строка с заявкой</span></div>
         <div><b>Менеджер</b><span>уведомление в Telegram</span></div>
       </div>
     </div>
