@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nazly: Telegram-боты, ИИ-ассистенты и Mini Apps</title>
+<meta name="description" content="Боты записи и оплаты, ИИ-ассистенты, Mini Apps и CRM для онлайн-школ, марказов и небольшого бизнеса.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nazlybeitullaeva-boop.github.io/">
+<meta property="og:title" content="Nazly: боты, которые продают за вас">
+<meta property="og:description" content="Telegram-боты, ИИ-ассистенты, Mini Apps и CRM. Три проекта, которые можно пройти прямо в браузере.">
+<meta property="og:image" content="https://nazlybeitullaeva-boop.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f6f3ee">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230d0d12'/%3E%3Ccircle cx='22' cy='22' r='5' fill='%232433ff'/%3E%3Ctext x='7' y='22' font-family='Arial' font-weight='900' font-size='16' fill='%23fff'%3En%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Смелый продукт: молочный фон, чёрный текст, кобальт как главный акцент, персик и мята как второстепенные. Один светлый мир, все цвета заданы явно. Выравнивание влево, плитки разного размера */
+:root{
+  --milk:#f6f3ee; --white:#ffffff; --ink:#0d0d12; --text:#3a3a44; --muted:#6c6c78; --line:#e3ded5;
+  --cobalt:#2433ff; --cobalt-soft:#e6e8ff; --peach:#ffb38a; --peach-soft:#ffe8da; --mint:#c8f0d8; --mint-ink:#16603a;
+  --display:'Unbounded','Arial Black',system-ui,sans-serif;
+  --body:'Onest',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--milk);color:var(--ink);font:16px/1.6 var(--body);padding-top:env(safe-area-inset-top,0px)}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{font-family:var(--display);text-wrap:balance}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--cobalt);outline-offset:3px;border-radius:12px}
+section[id],article[id]{scroll-margin-top:84px}
+.in{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* шапка */
+.top{position:sticky;top:0;z-index:20;background:rgba(246,243,238,.88);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+.top.scrolled{border-bottom-color:var(--line)}
+.top .in{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:14px}
+.logo{font:900 22px var(--display);letter-spacing:-.02em;text-decoration:none}
+.logo i{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--cobalt);margin-left:5px}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav a{border:1.5px solid var(--ink);border-radius:999px;padding:7px 15px;font-size:14px;font-weight:500;text-decoration:none}
+.nav a:hover{background:var(--ink);color:var(--milk)}
+.nav a.cta{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
+
+/* первый экран */
+.hero{padding-block:40px 72px}
+.hero .in{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:44px;align-items:center}
+.hero h1{font-weight:900;font-size:clamp(40px,7vw,92px);line-height:.98;letter-spacing:-.035em}
+.hl{background:var(--cobalt);color:#fff;padding:0 .14em;border-radius:.18em;display:inline-block;transform:rotate(-1.5deg)}
+.hero .lead{margin-top:26px;font-size:18px;max-width:32em;color:var(--text)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:15px 24px;border-radius:999px;font-weight:700;font-size:15.5px;text-decoration:none;background:var(--ink);color:#fff;border:0;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--peach);flex:0 0 10px}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.ghost::after{background:var(--cobalt)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.t{border-radius:24px;padding:20px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;gap:12px}
+.t b{font:900 clamp(34px,4vw,48px)/1 var(--display);letter-spacing:-.03em}
+.t span{font-size:14px;font-weight:500}
+.t1{background:var(--cobalt);color:#fff}
+.t2{background:var(--peach)}
+.t3{background:var(--ink);color:#fff;grid-column:1/-1;flex-direction:row;align-items:center;justify-content:flex-start;min-height:0;gap:16px}
+.t3 span{font-size:15px}
+.check{width:44px;height:44px;border-radius:50%;background:var(--mint);color:var(--ink);display:grid;place-items:center;font-weight:700;flex:0 0 44px}
+.sticker{display:inline-block;margin-top:22px;background:var(--mint);color:var(--mint-ink);font-weight:700;font-size:13.5px;padding:7px 14px;border-radius:999px;transform:rotate(-2deg)}
+@media (prefers-reduced-motion:no-preference){
+  .t{animation:pop .55s cubic-bezier(.2,.9,.25,1.2) both}
+  .t2{animation-delay:.12s}.t3{animation-delay:.24s}
+  @keyframes pop{from{opacity:.2;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+}
+
+/* бегущая строка */
+.strip{background:var(--ink);color:#fff;padding-block:18px;overflow:hidden}
+.strip .row{display:flex;gap:40px;white-space:nowrap;font:700 clamp(16px,2vw,22px) var(--display);letter-spacing:-.01em;width:max-content}
+.strip .row span{display:inline-flex;align-items:center;gap:40px}
+.strip .row span::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--peach)}
+@media (prefers-reduced-motion:no-preference){.strip .row{animation:run 40s linear infinite}@keyframes run{to{transform:translateX(-50%)}}}
+
+/* секции */
+.sec{padding-block:96px 24px}
+.sh{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:36px}
+.sh h2{font-weight:900;font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.035em}
+.sh p{color:var(--muted);max-width:30em}
+
+/* живое демо */
+.try{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:20px;align-items:stretch}
+.phone{background:#e9eef0;border:8px solid var(--ink);border-radius:34px;overflow:hidden;display:flex;flex-direction:column;height:600px;min-width:0}
+.phone .hd{background:var(--ink);color:#fff;padding:12px 14px;display:flex;gap:10px;align-items:center}
+.phone .hd i{width:34px;height:34px;border-radius:50%;background:var(--peach);color:var(--ink);display:grid;place-items:center;font-style:normal;font-weight:700;flex:0 0 34px}
+.phone .hd b{display:block;font-size:14px}.phone .hd small{font-size:11.5px;opacity:.7}
+.msgs{flex:1;overflow-y:auto;padding:12px 10px 14px;display:flex;flex-direction:column;gap:7px;scroll-behavior:smooth}
+.bb{max-width:86%;padding:8px 11px 5px;border-radius:14px;font-size:14px;line-height:1.4;white-space:pre-wrap}
+.bb small{display:block;text-align:right;font-size:10.5px;color:#7a7f8a}
+.bb.bot{background:#fff;align-self:flex-start;border-bottom-left-radius:4px}
+.bb.me{background:var(--mint);align-self:flex-end;border-bottom-right-radius:4px}
+.bb.typing{color:var(--muted);font-style:italic;padding-bottom:8px}
+.file{display:flex;gap:8px;align-items:center;font-weight:600}
+.file i{width:30px;height:30px;border-radius:50%;background:var(--cobalt);flex:0 0 30px}
+.kb{align-self:flex-start;width:86%;display:flex;flex-direction:column;gap:5px}
+.kb button{border:0;background:var(--cobalt);color:#fff;font-weight:600;font-size:14px;padding:10px;border-radius:12px}
+.kb button.sec2{background:#fff;color:var(--ink)}
+.kb button:disabled{opacity:.4;cursor:default}
+.mgr{background:var(--white);border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.mgr .ph{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.mgr .ph b{font:900 20px var(--display);letter-spacing:-.02em}
+.mgr .ph span{font-size:13px;color:var(--muted)}
+.kp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kp div{border-radius:18px;padding:14px;background:var(--milk);min-width:0}
+.kp b{display:block;font:900 30px/1 var(--display);letter-spacing:-.03em;font-variant-numeric:tabular-nums;transition:color .3s}
+.kp span{font-size:12.5px;color:var(--muted)}
+.kp .a{background:var(--mint)}.kp .p{background:var(--peach-soft)}
+.kp b.flash{color:var(--cobalt)}
+.list{display:flex;flex-direction:column}
+.li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line);font-size:14px}
+.li small{display:block;color:var(--muted);font-size:12px}
+.li.new{background:var(--cobalt-soft);margin:0 -12px;padding:11px 12px;border-radius:14px;border-top-color:transparent}
+.pill{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--mint);color:var(--mint-ink)}.p-wait{background:var(--peach-soft);color:#9a4a1c}.p-hot{background:var(--cobalt);color:#fff}.p-gray{background:var(--milk);color:var(--muted)}
+.act{display:flex;flex-direction:column;gap:8px;background:var(--ink);color:#fff;border-radius:20px;padding:16px}
+.act p{font-size:14px;color:rgba(255,255,255,.8)}
+.act .row2{display:flex;gap:8px;flex-wrap:wrap}
+.act button{border:0;border-radius:999px;padding:10px 16px;font-weight:700;font-size:14px;background:var(--peach);color:var(--ink)}
+.act button.alt{background:rgba(255,255,255,.12);color:#fff}
+.act[hidden]{display:none}
+.reset{align-self:flex-start;border:0;background:none;color:var(--muted);text-decoration:underline;font-size:13.5px;padding:0}
+
+/* задачи */
+.pains{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pain{background:var(--white);border-radius:24px;padding:26px;display:flex;flex-direction:column;gap:14px}
+.pain q{font:700 20px/1.25 var(--display);letter-spacing:-.01em;quotes:"«" "»"}
+.pain p{color:var(--text);font-size:15px}
+.pain .fix{margin-top:auto;background:var(--cobalt-soft);color:var(--cobalt);font-weight:600;font-size:14px;padding:10px 14px;border-radius:14px}
+
+/* кейсы */
+.case{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:20px;margin-bottom:20px}
+.ctext{background:var(--white);border-radius:28px;padding:34px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:999px;border:1.5px solid var(--ink)}
+.chip.c{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.ctext h3{font-weight:900;font-size:clamp(26px,3vw,38px);line-height:1.05;letter-spacing:-.03em}
+.ctext dl{margin:0;display:grid;gap:14px}
+.ctext dt{font-weight:700;font-size:13.5px;margin-bottom:2px}
+.ctext dd{margin:0;color:var(--text);font-size:15.5px}
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.nums div{background:var(--milk);border-radius:18px;padding:14px;min-width:0}
+.nums b{display:block;font:900 26px/1 var(--display);letter-spacing:-.03em}
+.nums span{font-size:12.5px;color:var(--muted)}
+.ctext .btn{align-self:flex-start;margin-top:auto}
+.note{font-size:12.5px;color:var(--muted)}
+.v1{background:var(--cobalt);border-radius:28px;padding:30px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:18px;align-items:center;min-width:0;position:relative;overflow:hidden}
+.v1::before{content:"";position:absolute;width:280px;height:280px;border-radius:50%;background:var(--peach);right:-90px;top:-110px}
+.mphone{position:relative;background:#e9eef0;border:7px solid var(--ink);border-radius:30px;overflow:hidden;min-width:0}
+.mphone .hd{background:var(--ink);color:#fff;padding:10px 12px;font-size:12px;font-weight:600;display:flex;gap:8px;align-items:center}
+.mphone .hd i{width:24px;height:24px;border-radius:50%;background:var(--peach);flex:0 0 24px}
+.mphone .ms{padding:10px 8px 12px;display:flex;flex-direction:column;gap:6px}
+.mphone .bb{font-size:11.5px;max-width:92%;padding:7px 9px 5px;border-radius:12px}
+.mphone .bb small{font-size:9.5px}
+.mphone .file i{width:20px;height:20px;flex:0 0 20px}
+.panel{position:relative;background:var(--white);border-radius:22px;padding:16px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.panel .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.panel .ph b{font:900 16px var(--display);letter-spacing:-.02em}
+.panel .ph span{font-size:11.5px;color:var(--muted)}
+.panel .kp{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.panel .kp div{padding:10px;border-radius:14px}
+.panel .kp b{font-size:22px}
+.panel .kp span{font-size:11px}
+.panel .li{font-size:12.5px;padding:8px 0}
+.panel .li small{font-size:10.5px}
+.panel .pill{font-size:10.5px;padding:3px 9px}
+.v2{background:var(--ink);border-radius:28px;padding:26px;min-width:0;display:flex;flex-direction:column;gap:12px;color:#fff}
+.roles{display:flex;gap:6px;flex-wrap:wrap}
+.roles button{border:0;font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.08);color:#fff}
+.roles button[aria-pressed="true"]{background:var(--peach);color:var(--ink)}
+.dash{background:var(--white);color:var(--ink);border-radius:22px;padding:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;min-height:330px;align-content:start}
+.dash .k{border-radius:16px;padding:12px;background:var(--milk);min-width:0}
+.dash .k b{display:block;font:900 clamp(17px,2vw,23px)/1.1 var(--display);letter-spacing:-.03em}
+.dash .k span{font-size:11px;color:var(--muted)}
+.dash .k.c{background:var(--cobalt);color:#fff}.dash .k.c span{color:rgba(255,255,255,.82)}
+.wide{grid-column:1/-1}
+.chart{border:1.5px solid var(--line);border-radius:16px;padding:12px}
+.chart small{font-size:11.5px;color:var(--muted)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:100px;margin-top:8px}
+.bars i{flex:1;border-radius:8px 8px 3px 3px;background:var(--cobalt-soft);min-width:0;transition:height .4s cubic-bezier(.2,.8,.2,1)}
+.bars i.on{background:var(--cobalt)}
+.axis{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:5px}
+.v2 .cap{font-size:12px;color:rgba(255,255,255,.6)}
+.v3{background:var(--peach);border-radius:28px;padding:26px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.msgr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.msgr button{border:0;background:rgba(13,13,18,.12);color:var(--ink);border-radius:16px;padding:12px 8px;font:700 14px var(--display);letter-spacing:-.01em}
+.msgr button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.flow{display:flex;justify-content:center}
+.flow i{width:2px;height:22px;background:var(--ink);opacity:.5}
+.core{background:var(--white);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.core .ph{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.core .ph b{font:900 16px var(--display);letter-spacing:-.02em}
+.core .ph span{font-size:11.5px;color:var(--muted)}
+.path{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;font-weight:600}
+.path span{background:var(--milk);border-radius:999px;padding:5px 11px}
+.path span.var{background:var(--cobalt);color:#fff}
+.path em{font-style:normal;color:var(--muted)}
+.norm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;background:var(--cobalt-soft);border-radius:14px;padding:9px 12px}
+.norm s{color:var(--muted)}
+.norm b{color:var(--cobalt)}
+.outs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.outs div{background:var(--white);border-radius:16px;padding:12px;min-width:0}
+.outs b{display:block;font:700 13px var(--display);letter-spacing:-.01em;margin-bottom:3px}
+.outs span{font-size:11.5px;color:var(--muted);display:block;line-height:1.35;overflow-wrap:anywhere}
+
+/* подбор */
+.pick{background:var(--ink);color:#fff;border-radius:32px;padding:clamp(24px,4vw,44px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.pick h2{font-weight:900;font-size:clamp(28px,3.6vw,44px);line-height:1.02;letter-spacing:-.03em}
+.pick > div > p{color:rgba(255,255,255,.72);margin-top:12px}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:22px}
+.opts button{text-align:left;border:1.5px solid rgba(255,255,255,.22);background:transparent;color:#fff;border-radius:16px;padding:13px 16px;font-size:15px;font-weight:500;transition:background .15s,border-color .15s}
+.opts button:hover{border-color:#fff}
+.opts button[aria-pressed="true"]{background:#fff;color:var(--ink);border-color:#fff}
+.res{background:var(--cobalt);border-radius:24px;padding:26px;display:flex;flex-direction:column;gap:12px;min-height:100%}
+.res small{font-size:13px;opacity:.8}
+.res h3{font-weight:900;font-size:clamp(22px,2.6vw,30px);line-height:1.08;letter-spacing:-.02em}
+.res p{color:rgba(255,255,255,.88);font-size:15.5px}
+.res .btn{background:#fff;color:var(--ink);align-self:flex-start;margin-top:auto}
+.res .btn::after{background:var(--cobalt)}
+.res.empty{background:rgba(255,255,255,.06);justify-content:center}
+.res.empty p{color:rgba(255,255,255,.6)}
+
+/* услуги */
+.svc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.s{border-radius:28px;padding:30px;display:flex;flex-direction:column;gap:16px;transition:box-shadow .3s,transform .3s}
+.s.lit{box-shadow:0 0 0 4px var(--cobalt);transform:translateY(-4px)}
+.s h3{font-weight:900;font-size:24px;line-height:1.1;letter-spacing:-.025em}
+.s p{font-size:15px}
+.s ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.s li{display:flex;gap:10px}
+.s li::before{content:"";width:8px;height:8px;border-radius:50%;margin-top:.55em;flex:0 0 8px;background:currentColor;opacity:.6}
+.s .term{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:16px;border-top:1.5px solid currentColor;font-weight:600}
+.s .term b{font:900 18px var(--display)}
+.s .fine{font-size:12.5px;opacity:.72;margin-top:-6px}
+.s1{background:var(--cobalt);color:#fff}
+.s2{background:var(--white)}
+.s3{background:var(--peach)}
+.s4{background:var(--ink);color:#fff}
+.s5{background:var(--mint)}
+.s6{background:var(--cobalt-soft)}
+.s4.lit,.s1.lit{box-shadow:0 0 0 4px var(--peach)}
+
+/* процесс */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;counter-reset:s}
+.steps li{counter-increment:s;background:var(--white);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:10px}
+.steps li::before{content:counter(s);width:46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:900 18px var(--display)}
+.steps li:nth-child(3)::before{background:var(--cobalt)}
+.steps b{font:700 18px var(--display);letter-spacing:-.02em}
+.steps p{color:var(--text);font-size:15px}
+
+/* вопросы */
+.faq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.faq details{background:var(--white);border-radius:22px;padding:0 22px}
+.faq summary{list-style:none;cursor:pointer;padding:20px 0;display:flex;justify-content:space-between;gap:16px;align-items:center;font:700 16px/1.3 var(--display);letter-spacing:-.01em}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";width:32px;height:32px;border-radius:50%;background:var(--milk);display:grid;place-items:center;font:500 20px var(--body);flex:0 0 32px;transition:transform .2s,background .2s}
+.faq details[open] summary::after{transform:rotate(45deg);background:var(--peach)}
+.faq details p{padding:0 0 20px;color:var(--text);font-size:15px}
+
+/* финал */
+.end{padding-block:96px 40px}
+.endbox{background:var(--ink);color:#fff;border-radius:36px;padding:clamp(28px,5vw,64px);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:36px;align-items:end;position:relative;overflow:hidden}
+.endbox::after{content:"";position:absolute;width:320px;height:320px;border-radius:50%;background:var(--cobalt);right:-100px;bottom:-140px}
+.endbox h2{font-weight:900;font-size:clamp(34px,5.4vw,70px);line-height:.98;letter-spacing:-.035em;position:relative;z-index:1}
+.endbox h2 .p{color:var(--peach)}
+.endbox .r{position:relative;z-index:1;display:flex;flex-direction:column;gap:16px}
+.endbox p{color:rgba(255,255,255,.8)}
+.endbox .tg{background:rgba(255,255,255,.08);border-radius:18px;padding:16px;font-size:14.5px;color:rgba(255,255,255,.88)}
+.endbox .tg b{color:var(--peach)}
+.foot{padding-block:24px 36px;font-size:13px;color:var(--muted)}
+.foot .in{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:980px){
+  .hero .in,.case,.endbox,.try,.pick{grid-template-columns:minmax(0,1fr)}
+  .pains,.svc,.faq{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .phone{height:540px;max-width:420px;width:100%;margin:0 auto}
+}
+@media (max-width:700px){
+  .nav a:not(.cta){display:none}
+  .sec{padding-block:72px 16px}
+  .v1{grid-template-columns:minmax(0,1fr);padding:20px}
+  .mphone{max-width:300px}
+  .dash{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .nums b{font-size:20px}
+  .ctext{padding:24px}
+  .t{min-height:118px;padding:16px}
+  .t b{font-size:30px;white-space:nowrap}
+  .outs{grid-template-columns:minmax(0,1fr)}
+  .outs div{display:flex;gap:10px;align-items:baseline;padding:10px 12px}
+  .outs b{margin:0;flex:0 0 auto}
+  .kp b{font-size:24px}
+  .mgr{padding:18px}
+  .hero{padding-block:24px 56px}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="in">
+    <a class="logo" href="#hero" aria-label="nazly, в начало">nazly<i></i></a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#try">Попробовать</a><a href="#cases">Проекты</a><a href="#services">Услуги</a><a class="cta" href="#contact">Обсудить</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="hero">
+  <div class="in">
+    <div>
+      <h1>Боты, которые <span class="hl">продают</span> за вас</h1>
+      <p class="lead">Делаю Telegram-ботов, ИИ-ассистентов и Mini Apps для онлайн-школ, марказов и небольшого бизнеса. Бот отвечает ночью, собирает заявки, принимает оплату и напоминает, а вы видите всех клиентов в одном списке.</p>
+      <div class="btns">
+        <a class="btn" href="#try">Попробовать бота</a>
+        <a class="btn ghost" href="#cases">Смотреть проекты</a>
+      </div>
+      <span class="sticker">Отвечает 24/7, даже в выходные</span>
+    </div>
+    <div class="tiles" aria-label="Что умеет бот">
+      <div class="t t1"><b>0 мин</b><span>до ответа на заявку</span></div>
+      <div class="t t2"><b>×2</b><span>напоминания без менеджера</span></div>
+      <div class="t t3"><span class="check">✓</span><span>Оплата подтверждена одной кнопкой. Клиент уже в группе.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="strip" aria-hidden="true">
+  <div class="row">
+    <span>Заявки ночью</span><span>Приём чеков</span><span>Напоминания об оплате</span><span>ИИ-ответы по вашей базе</span><span>Mini Apps</span><span>Кабинеты по ролям</span>
+    <span>Заявки ночью</span><span>Приём чеков</span><span>Напоминания об оплате</span><span>ИИ-ответы по вашей базе</span><span>Mini Apps</span><span>Кабинеты по ролям</span>
+  </div>
+</div>
+
+<section class="sec in" id="try" aria-labelledby="try-h">
+  <div class="sh"><h2 id="try-h">Попробуйте сами</h2><p>Слева чат клиента с ботом, справа экран менеджера. Нажимайте кнопки в чате: заявка появится справа в ту же секунду.</p></div>
+  <div class="try">
+    <div class="phone" aria-label="Чат с ботом записи">
+      <div class="hd"><i>ع</i><div><b>Академия · запись</b><small>бот · отвечает сразу</small></div></div>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+    </div>
+    <div class="mgr">
+      <div class="ph"><b>Экран менеджера</b><span>Сёстры · Пн, Ср, Сб · 19:00</span></div>
+      <div class="kp">
+        <div><b id="kApps">64</b><span>заявок</span></div>
+        <div class="a"><b id="kPaid">41</b><span>оплатили</span></div>
+        <div class="p"><b id="kWait">14</b><span>ждут оплаты</span></div>
+      </div>
+      <div class="act" id="act" hidden>
+        <p id="actText"></p>
+        <div class="row2" id="actBtns"></div>
+      </div>
+      <div class="list" id="list"></div>
+      <button class="reset" id="reset" type="button">Начать заново</button>
+    </div>
+  </div>
+</section>
+
+<section class="sec in" aria-labelledby="pains-h">
+  <div class="sh"><h2 id="pains-h">Знакомо?</h2><p>Так описала свою работу менеджер онлайн-академии, с которой я разбирала процесс записи.</p></div>
+  <div class="pains">
+    <article class="pain"><q>Записываются, а с оплатой тянут</q><p>Напоминать приходится вручную, в группе и в личке, и реагируют не всегда.</p><span class="fix">Бот сам отправит два вежливых напоминания</span></article>
+    <article class="pain"><q>Отвечаю по очереди в течение дня</q><p>Заявок больше пятидесяти в день, пока дойдёт очередь, человек может уже не ответить.</p><span class="fix">Первый ответ уходит в ту же минуту</span></article>
+    <article class="pain"><q>Оплаты в таблице, приложении и блокноте</q><p>Чтобы понять, кто оплатил, нужно открыть три места и сверить вручную.</p><span class="fix">Один список: записались, оплатили, ждут</span></article>
+  </div>
+</section>
+
+<section class="sec in" id="cases" aria-labelledby="cases-h">
+  <div class="sh"><h2 id="cases-h">Проекты</h2><p>Концепт-проекты под реальный процесс записи онлайн-академии и демо под типичную задачу заказчика с фриланса. Каждый можно открыть и пройти. Данные условные.</p></div>
+
+  <article class="case">
+    <div class="ctext">
+      <div class="chips"><span class="chip c">Telegram-бот</span><span class="chip">Экран менеджера</span><span class="chip">Пилот на 1 группе</span></div>
+      <h3>Запись и оплата без ручной работы</h3>
+      <dl>
+        <div><dt>Задача</dt><dd>Женские группы ведёт один менеджер: больше 50 заявок в день, ответы по очереди, напоминания об оплате вручную.</dd></div>
+        <div><dt>Решение</dt><dd>Бот ведёт ученицу от заявки до оплаты: анкета для сертификата, условия, реквизиты, чек, два напоминания. Менеджер подтверждает оплату одной кнопкой и отвечает только на нестандартные вопросы.</dd></div>
+      </dl>
+      <div class="nums"><div><b>50+</b><span>заявок в день</span></div><div><b>1</b><span>кнопка на оплату</span></div><div><b>2 нед</b><span>пилот</span></div></div>
+      <a class="btn" href="https://nazlybeitullaeva-boop.github.io/huna-pilot-demo/" target="_blank" rel="noopener">Открыть прототип</a>
+    </div>
+    <div class="v1" aria-hidden="true">
+      <div class="mphone">
+        <div class="hd"><i></i>Академия · запись</div>
+        <div class="ms">
+          <div class="bb me">Хочу записаться на арабский<small>23:47</small></div>
+          <div class="bb bot">Набор открыт, осталось 8 мест. Записать вас?<small>23:47</small></div>
+          <div class="bb bot">К оплате 5 990 ₽. Пришлите чек сюда.<small>23:51</small></div>
+          <div class="bb me"><span class="file"><i></i>chek_sbp.pdf</span><small>23:55</small></div>
+          <div class="bb bot">Оплата подтверждена ✅<small>08:12</small></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph"><b>Группа пилота</b><span>Сёстры · 19:00</span></div>
+        <div class="kp"><div><b>65</b><span>заявок</span></div><div class="a"><b>42</b><span>оплатили</span></div><div class="p"><b>14</b><span>ждут оплаты</span></div><div><b>3</b><span>проверить чек</span></div></div>
+        <div class="list">
+          <div class="li"><div>Амина Т.<small>9 окт, 23:47</small></div><span class="pill p-hot">Чек</span></div>
+          <div class="li"><div>Джамиля Н.<small>оплата 9 окт</small></div><span class="pill p-ok">В группе</span></div>
+          <div class="li"><div>Зейнаб Т.<small>напоминаний: 1</small></div><span class="pill p-wait">Ждёт</span></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="case">
+    <div class="ctext">
+      <div class="chips"><span class="chip c">CRM</span><span class="chip">5 ролей</span><span class="chip">Отчёты в PDF</span></div>
+      <h3>Вся академия в одной системе</h3>
+      <dl>
+        <div><dt>Задача</dt><dd>Заявки, оплаты, группы, часы преподавателей и реклама разбросаны по разным местам, руководитель не видит картину целиком.</dd></div>
+        <div><dt>Решение</dt><dd>У каждого свой кабинет: ученица видит расписание и оплаты, преподаватель часы и посещаемость, менеджер заявки, директор сотрудников и рекламу, владелец доходы и расходы по каждой группе.</dd></div>
+      </dl>
+      <div class="nums"><div><b>135</b><span>групп в модели</span></div><div><b>46</b><span>экранов</span></div><div><b>13</b><span>отчётов</span></div></div>
+      <a class="btn" href="https://nazlybeitullaeva-boop.github.io/huna-pilot-demo/crm.html" target="_blank" rel="noopener">Открыть прототип</a>
+      <p class="note">Удобнее смотреть с компьютера</p>
+    </div>
+    <div class="v2">
+      <div class="roles" id="roles" role="group" aria-label="Кабинет какой роли показать">
+        <button type="button" data-r="student" aria-pressed="false">Ученик</button><button type="button" data-r="teacher" aria-pressed="false">Преподаватель</button><button type="button" data-r="manager" aria-pressed="false">Менеджер</button><button type="button" data-r="director" aria-pressed="false">Директор</button><button type="button" data-r="owner" aria-pressed="true">Владелец</button>
+      </div>
+      <div class="dash" id="dash" aria-live="polite"></div>
+      <span class="cap">Нажмите на роль, чтобы увидеть её кабинет. Модельные данные</span>
+    </div>
+  </article>
+
+  <article class="case">
+    <div class="ctext">
+      <div class="chips"><span class="chip c">Telegram · VK · MAX</span><span class="chip">Node.js</span><span class="chip">Демо под типичную задачу</span></div>
+      <h3>LeadBot: заявки и файлы в трёх мессенджерах</h3>
+      <dl>
+        <div><dt>Задача</dt><dd>Типичный заказ с фриланса: боты в Telegram, VK и MAX собирают контакты и в ответ присылают файл, а файлов несколько, по разным направлениям.</dd></div>
+        <div><dt>Решение</dt><dd>Человек выбирает направление, оставляет имя и телефон и сразу получает PDF. Заявка сохраняется в CSV и приходит менеджеру в Telegram. Сценарий написан один раз, для каждого мессенджера свой тонкий адаптер, поэтому правка сразу работает везде.</dd></div>
+        <div><dt>Ещё умеет</dt><dd>Два режима без правки кода: один бот с выбором темы или отдельный бот на каждое направление. Повторно пришедший человек получает файл без анкеты. Согласие по 152-ФЗ, защита от подстановки чужого контакта, кэш файлов в VK и MAX.</dd></div>
+        <div><dt>Стек</dt><dd>Node.js, grammY, vk-io, @maxhub/max-bot-api, dotenv, node:test. Заявки в CSV, без базы данных.</dd></div>
+      </dl>
+      <div class="nums"><div><b>3</b><span>мессенджера</span></div><div><b>1</b><span>сценарий на все</span></div><div><b>5/5</b><span>автотестов проходят</span></div></div>
+      <a class="btn" href="leadbot.html" target="_blank" rel="noopener">Пройти диалог в браузере</a>
+    </div>
+    <div class="v3">
+      <div class="msgr" id="msgr" role="group" aria-label="Мессенджер">
+        <button type="button" data-m="tg" aria-pressed="true">Telegram</button><button type="button" data-m="vk" aria-pressed="false">VK</button><button type="button" data-m="max" aria-pressed="false">MAX</button>
+      </div>
+      <div class="flow" aria-hidden="true"><i></i></div>
+      <div class="core">
+        <div class="ph"><b>Один сценарий</b><span id="adapter">адаптер: Telegram</span></div>
+        <div class="path"><span>/start</span><em>→</em><span>Маркетинг</span><em>→</em><span>Имя</span><em>→</em><span class="var" id="phoneStep">Кнопка «Отправить номер»</span></div>
+        <div class="norm"><s id="rawPhone">8 (999) 123-45-67</s><span>→</span><b>+79991234567</b></div>
+        <p class="note" id="msgrNote">В Telegram и MAX номер отправляется одной кнопкой.</p>
+      </div>
+      <div class="flow" aria-hidden="true"><i></i></div>
+      <div class="outs">
+        <div><b>PDF</b><span>файл по выбранной теме</span></div>
+        <div><b>CSV</b><span>строка с заявкой</span></div>
+        <div><b>Менеджер</b><span>уведомление в Telegram</span></div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section class="sec in" aria-labelledby="pick-h">
+  <div class="pick">
+    <div>
+      <h2 id="pick-h">Что подойдёт именно вам?</h2>
+      <p>Выберите, где сейчас теряется больше всего времени или клиентов.</p>
+      <div class="opts" id="opts" role="group" aria-label="Где теряются клиенты">
+        <button type="button" data-k="pay" aria-pressed="false">Записываются, но не платят</button>
+        <button type="button" data-k="ai" aria-pressed="false">Долго отвечаем на одни и те же вопросы</button>
+        <button type="button" data-k="multi" aria-pressed="false">Заявки приходят из разных мессенджеров</button>
+        <button type="button" data-k="app" aria-pressed="false">Клиентам сложно выбрать курс или товар</button>
+        <button type="button" data-k="crm" aria-pressed="false">Менеджеры путаются, кто с кем общался</button>
+        <button type="button" data-k="bi" aria-pressed="false">Не видим, сколько приносит каждая группа</button>
+      </div>
+    </div>
+    <div class="res empty" id="res" aria-live="polite"><p>Здесь появится решение, с которого стоит начать.</p></div>
+  </div>
+</section>
+
+<section class="sec in" id="services" aria-labelledby="svc-h">
+  <div class="sh"><h2 id="svc-h">Услуги</h2><p>Начинаю с одного участка, который можно проверить за пару недель, и расширяю по этапам.</p></div>
+  <div class="svc">
+    <article class="s s1" id="svc-pay">
+      <h3>Бот записи и оплаты</h3>
+      <p>Для центров, где запись идёт через личные сообщения.</p>
+      <ul><li>Мгновенный ответ и анкета</li><li>Реквизиты, чек, подтверждение</li><li>Напоминания об оплате</li><li>Передача вопросов менеджеру</li></ul>
+      <div class="term"><span>Срок</span><b>от 2 недель</b></div>
+    </article>
+    <article class="s s4" id="svc-ai">
+      <h3>ИИ-ассистент в Telegram</h3>
+      <p>Когда клиенты пишут вопросы своими словами и ждут ответа часами.</p>
+      <ul><li>Отвечает 24/7 по вашей базе: цены, расписание, условия</li><li>Не выдумывает: чего нет в базе, передаёт менеджеру с перепиской</li><li>Ведёт к записи и оплате прямо в диалоге</li><li>Одно мягкое напоминание тем, кто пропал</li><li>Менеджер забирает диалог одной командой</li></ul>
+      <div class="term"><span>Срок</span><b>от 3 недель</b></div>
+      <small class="fine">Работа модели оплачивается отдельно, по расходу</small>
+    </article>
+    <article class="s s3" id="svc-app">
+      <h3>Telegram Mini App</h3>
+      <p>Когда курсов, групп или товаров много и в переписке их не выбрать. Школам, марказам, магазинам.</p>
+      <ul><li>Каталог курсов или товаров с фильтрами</li><li>Запись на пробный урок в пару касаний</li><li>Кабинет: расписание, задания, прогресс</li><li>Корзина и оплата внутри Telegram</li><li>Открывается из чата, без скачивания</li></ul>
+      <div class="term"><span>Срок</span><b>от 3 недель</b></div>
+    </article>
+    <article class="s s5" id="svc-multi">
+      <h3>Бот заявок в Telegram, VK и MAX</h3>
+      <p>Когда клиенты приходят из разных мессенджеров, а обрабатывать хочется в одном месте.</p>
+      <ul><li>Один сценарий на три мессенджера</li><li>Файл или подарок в ответ на контакты</li><li>Телефон в любом формате к одному виду</li><li>Заявки в таблицу и сразу менеджеру</li></ul>
+      <div class="term"><span>Срок</span><b>от 1 недели</b></div>
+    </article>
+    <article class="s s2" id="svc-crm">
+      <h3>Система учёта для команды</h3>
+      <p>Когда менеджеров несколько и данные расходятся.</p>
+      <ul><li>Заявки по дням, неделям и месяцам</li><li>Оплаты и группы в одном месте</li><li>Архив переписок</li><li>Доступ по Telegram-нику</li></ul>
+      <div class="term"><span>Срок</span><b>от 5 недель</b></div>
+    </article>
+    <article class="s s6" id="svc-bi">
+      <h3>Аналитика для руководителя</h3>
+      <p>Деньги и нагрузка без сводных таблиц.</p>
+      <ul><li>Доходы и расходы по группам</li><li>Окупаемость рекламы</li><li>Часы и загрузка сотрудников</li><li>Отчёты в PDF</li></ul>
+      <div class="term"><span>Срок</span><b>от 5 недель</b></div>
+    </article>
+  </div>
+</section>
+
+<section class="sec in" id="process" aria-labelledby="proc-h">
+  <div class="sh"><h2 id="proc-h">Как работаю</h2><p>Вы видите результат до того, как платите за всю систему.</p></div>
+  <ol class="steps">
+    <li><b>Разбор процесса</b><p>Короткий разговор о том, как сейчас идут заявки и оплата. Пересказываю и даю поправить.</p></li>
+    <li><b>Прототип</b><p>Собираю пример под ваш процесс. Его можно открыть с телефона и пройти самим.</p></li>
+    <li><b>Пилот</b><p>Запуск на одном участке на пару недель. Сравниваем с тем, как было: сколько дошло до оплаты и как быстро люди получали ответ.</p></li>
+    <li><b>Запуск</b><p>Подключаю остальное по этапам, слежу за работой и вношу правки.</p></li>
+  </ol>
+</section>
+
+<section class="sec in" aria-labelledby="faq-h">
+  <div class="sh"><h2 id="faq-h">Частые вопросы</h2></div>
+  <div class="faq">
+    <details><summary>Сколько стоит?</summary><p>Зависит от объёма. После короткого разбора называю фиксированную цену за этап. Цена не меняется, если объём остаётся тем же.</p></details>
+    <details><summary>Как проходит оплата?</summary><p>50% до начала этапа и 50% после приёмки. Большой проект делится на этапы, каждый оплачивается отдельно.</p></details>
+    <details><summary>Что нужно от вас?</summary><p>Тексты и условия, реквизиты, файлы для клиентов и контакт человека, который будет принимать заявки. Список присылаю заранее.</p></details>
+    <details><summary>Сколько правок входит?</summary><p>Два раунда в цене этапа. Ошибки с моей стороны исправляю бесплатно. Новые функции оцениваю отдельно до начала работы.</p></details>
+    <details><summary>Какие будут ежемесячные расходы?</summary><p>Сервер и сервисы, обычно несколько тысяч рублей в месяц. Для ИИ-ассистента ещё оплата модели по расходу. Все суммы называю до старта.</p></details>
+    <details><summary>Кому принадлежат бот и данные?</summary><p>Вам. Бот и данные клиентов оформляются на вас, доступ к ним остаётся у вас и после окончания работы.</p></details>
+  </div>
+</section>
+
+<section class="end in" id="contact" aria-labelledby="end-h">
+  <div class="endbox">
+    <h2 id="end-h">Разберём ваш <span class="p">процесс заявок</span></h2>
+    <div class="r">
+      <p>Расскажите, как у вас сейчас проходят заявки и оплата. Отвечу, что можно передать боту, а что лучше оставить менеджеру.</p>
+      <div class="tg"><b>Как связаться:</b> напишите мне в Telegram, в тот чат, из которого пришла ссылка на это портфолио.</div>
+      <a class="btn" href="#try" style="background:var(--peach);color:var(--ink)">Ещё раз попробовать бота</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot"><div class="in"><span>nazly · боты, ИИ-ассистенты и Mini Apps · 2026</span><span>Данные в прототипах условные</span></div></footer>
+
+<script>
+(function(){
+  'use strict';
+  var $=function(id){return document.getElementById(id);};
+  function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* шапка */
+  var top=$('top');
+  addEventListener('scroll',function(){top.classList.toggle('scrolled',scrollY>8);},{passive:true});
+
+  /* живое демо */
+  var msgs=$('msgs'),list=$('list'),act=$('act'),actText=$('actText'),actBtns=$('actBtns');
+  var clock,S,timer=[];
+  var SEED=[['Джамиля Н.','оплата сегодня','p-ok','В группе'],['Зейнаб Т.','напоминаний: 1','p-wait','Ждёт оплаты'],['Мадина К.','оплата вчера','p-ok','В группе']];
+  function p2(n){return (n<10?'0':'')+n;}
+  function t(){return p2(clock.getHours())+':'+p2(clock.getMinutes());}
+  function tick(m){clock=new Date(clock.getTime()+(m||1)*60000);}
+  function scroll(){msgs.scrollTop=msgs.scrollHeight;}
+  function bubble(cls,text){var b=el('div','bb '+cls);b.appendChild(document.createTextNode(text));b.appendChild(el('small',null,t()));msgs.appendChild(b);scroll();return b;}
+  function later(fn,ms){var id=setTimeout(fn,reduce?0:ms);timer.push(id);}
+  function say(text,btns,done){
+    var ty=el('div','bb bot typing','печатает…');msgs.appendChild(ty);scroll();
+    later(function(){ty.remove();bubble('bot',text);if(btns)kb(btns);if(done)done();},650);
+  }
+  function kb(btns){
+    var k=el('div','kb');
+    btns.forEach(function(x){var b=el('button',x[2]||'',x[0]);b.type='button';b.onclick=function(){Array.prototype.forEach.call(k.children,function(c){c.disabled=true;});go(x[1],x[0]);};k.appendChild(b);});
+    msgs.appendChild(k);scroll();
+  }
+  function flash(id,val){var e=$(id);e.textContent=val;e.classList.add('flash');later(function(){e.classList.remove('flash');},900);}
+  function kpis(){flash('kApps',S.apps);flash('kPaid',S.paid);flash('kWait',S.wait);}
+  function renderList(){
+    list.innerHTML='';
+    if(S.row){var r=el('div','li new');r.innerHTML='<div>'+S.row[0]+'<small>'+S.row[1]+'</small></div><span class="pill '+S.row[2]+'">'+S.row[3]+'</span>';list.appendChild(r);}
+    SEED.forEach(function(x){var r=el('div','li');r.innerHTML='<div>'+x[0]+'<small>'+x[1]+'</small></div><span class="pill '+x[2]+'">'+x[3]+'</span>';list.appendChild(r);});
+  }
+  function action(text,btns){
+    if(!text){act.hidden=true;return;}
+    act.hidden=false;actText.textContent=text;actBtns.innerHTML='';
+    btns.forEach(function(x){var b=el('button',x[2]||'',x[0]);b.type='button';b.onclick=function(){action(null);go(x[1]);};actBtns.appendChild(b);});
+  }
+  var PAY=[['📎 Отправить чек','receipt'],['Оплачу позже','later','sec2'],['❓ Есть вопрос','ask','sec2']];
+  function go(a,label){
+    if(label)bubble('me',label.replace(/^[^A-Za-zА-Яа-яЁё]+/,''));
+    tick(1);
+    switch(a){
+      case 'read':
+        say('Набор открыт 🌿\nГруппа сестёр: Пн, Ср, Сб в 19:00\nСтарт 19 октября, осталось 8 мест.\n\nЗаписать вас?',[['Записаться','join'],['❓ Есть вопрос','askPre','sec2']]);break;
+      case 'join':
+        say('Как вас записать? Имя и фамилия, как на сертификате.',[['Амина Тестова','name']]);break;
+      case 'name':
+        S.apps++;S.wait++;S.row=['Амина Т.','заявка '+t(),'p-wait','Ждёт оплаты'];kpis();renderList();
+        say('Заявка принята ✅\nК оплате 5 990 ₽ за 30 уроков.\nПереведите по реквизитам и пришлите чек сюда.',PAY);break;
+      case 'later':
+        say('Хорошо 🌿 Место за вами до 17 октября. Напомню через 2 дня.');
+        S.row=['Амина Т.','напоминание запланировано','p-wait','Ждёт оплаты'];renderList();
+        action('Бот сам напомнит об оплате. Перемотайте время, чтобы увидеть напоминание.',[['⏩ Прошло 2 дня','remind']]);break;
+      case 'remind':
+        tick(60*34);S.row=['Амина Т.','напоминаний: 1','p-wait','Ждёт оплаты'];renderList();
+        say('Ассаламу алейкум, Амина! Напоминаю про оплату: место в группе за вами до 17 октября. Если есть вопросы, подскажу.',PAY);break;
+      case 'askPre': case 'ask':
+        S.after=(a==='askPre')?'pre':'pay';
+        bubble('me','Можно оплатить двумя частями?');
+        say('Чтобы не ошибиться, уточню у менеджера и отвечу здесь же 👤');
+        action('Новый вопрос от клиента: «Можно оплатить двумя частями?» Бот не знает ответа и передал его вам.',[['Ответить: да, можно','answer']]);break;
+      case 'answer':
+        say('Ответ менеджера: да, можно оплатить двумя частями, вторую до середины курса.',S.after==='pre'?[['Записаться','join']]:PAY);break;
+      case 'receipt':
+        var b=el('div','bb me');b.innerHTML='<span class="file"><i></i>chek_sbp.pdf</span><small>'+t()+'</small>';msgs.appendChild(b);scroll();
+        S.row=['Амина Т.','чек получен '+t(),'p-hot','Проверить чек'];renderList();
+        say('Чек получен и передан менеджеру. Подтверждение придёт сюда же.');
+        action('Пришёл чек от Амины Т. на 5 990 ₽. Проверьте перевод и подтвердите.',[['Подтвердить оплату','confirm'],['Перевод не найден','reject','alt']]);break;
+      case 'reject':
+        say('Менеджер не нашла перевод по этому чеку. Проверьте, пожалуйста, сумму и пришлите чек ещё раз.',[['📎 Отправить чек','receipt']]);
+        S.row=['Амина Т.','чек не принят','p-wait','Ждёт оплаты'];renderList();break;
+      case 'confirm':
+        tick(9*60);S.paid++;S.wait--;S.row=['Амина Т.','оплата '+t(),'p-ok','В группе'];kpis();renderList();
+        say('Оплата подтверждена ✅\nВы в группе сестёр. Первый урок 19 октября в 19:00.\nСсылку на группу пришлю за день до начала.',null,function(){
+          action('Готово: клиент в группе, менеджер нажал одну кнопку. Можно пройти путь заново и выбрать другие ответы.',[['Начать заново','restart']]);
+        });break;
+      case 'restart': start();break;
+    }
+  }
+  function start(){
+    timer.forEach(clearTimeout);timer=[];
+    clock=new Date(2026,9,9,23,47);S={apps:64,paid:41,wait:14,row:null,after:'pre'};
+    msgs.innerHTML='';action(null);
+    ['kApps','kPaid','kWait'].forEach(function(id,i){$(id).textContent=[64,41,14][i];});
+    renderList();
+    var s=el('div','bb me');s.appendChild(document.createTextNode('Ассаламу алейкум! Хочу на курс арабского'));s.appendChild(el('small',null,t()));msgs.appendChild(s);
+    say('Ва алейкум ас-салям! Это бот записи 🌿 Отвечаю сразу, в любое время.\n\nУмеете читать по-арабски?',[['Да','read'],['Нет, начну с нуля','read','sec2']]);
+  }
+  $('reset').onclick=start;
+  start();
+
+  /* CRM: кабинеты ролей */
+  var ROLES={
+    owner:{k:[['4,1 млн ₽','выручка за месяц',1],['2,6 млн ₽','расходы'],['1,1 млн ₽','свободные деньги']],chart:['Оплаты по неделям',[46,60,54,70,64,82,76,94]],rows:[['Уровень 1.1 · утро','64 из 72 мест','p-ok','+182 тыс'],['Уровень 2.2 · вечер','58 из 72 мест','p-wait','+96 тыс']]},
+    director:{k:[['52','сотрудника',1],['87%','средняя загрузка'],['3,4×','окупаемость рекламы']],chart:['Заявки с рекламы по наборам',[38,52,47,66,58,74,71,88]],rows:[['Ахмад И. · преподаватель','28 ч на этой неделе','p-ok','норма'],['Фатима М. · менеджер','46 заявок сегодня','p-wait','высокая нагрузка']]},
+    manager:{k:[['52','заявки сегодня',1],['11','ждут оплаты'],['3','чека на проверку']],chart:['Заявки по дням',[30,44,41,52,39,58,47,52]],rows:[['Амина Т.','чек получен 23:55','p-hot','Проверить'],['Зейнаб Т.','напоминаний: 1','p-wait','Ждёт']]},
+    teacher:{k:[['6','групп',1],['28 ч','на этой неделе'],['92%','посещаемость']],chart:['Часы по неделям',[22,26,24,28,27,30,26,28]],rows:[['Уровень 1.1 · утро','сегодня 09:00','p-ok','отметить'],['Уровень 2.2 · вечер','сегодня 19:00','p-gray','позже']]},
+    student:{k:[['19:00','следующий урок',1],['12/30','уроков пройдено'],['Оплачено','до декабря']],chart:['Прогресс по урокам',[40,48,55,61,66,72,78,84]],rows:[['Домашнее задание · урок 12','сдать до пятницы','p-wait','не сдано'],['Тест · урок 10','86 из 100','p-ok','сдан']]}
+  };
+  var dash=$('dash');
+  function role(r){
+    var d=ROLES[r];dash.innerHTML='';
+    d.k.forEach(function(k){var c=el('div','k'+(k[2]?' c':''));c.innerHTML='<b>'+k[0]+'</b><span>'+k[1]+'</span>';dash.appendChild(c);});
+    var ch=el('div','chart wide');ch.innerHTML='<small>'+d.chart[0]+'</small><div class="bars">'+d.chart[1].map(function(h,i,a){return '<i'+(i===a.length-1?' class="on"':'')+' style="height:'+(reduce?h:4)+'%" data-h="'+h+'"></i>';}).join('')+'</div><div class="axis"><span>август</span><span>сентябрь</span><span>октябрь</span></div>';
+    dash.appendChild(ch);
+    var g=el('div','wide list');d.rows.forEach(function(x){var r=el('div','li');r.innerHTML='<div>'+x[0]+'<small>'+x[1]+'</small></div><span class="pill '+x[2]+'">'+x[3]+'</span>';g.appendChild(r);});dash.appendChild(g);
+    if(!reduce)requestAnimationFrame(function(){requestAnimationFrame(function(){Array.prototype.forEach.call(dash.querySelectorAll('.bars i'),function(i){i.style.height=i.dataset.h+'%';});});});
+  }
+  $('roles').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});role(b.dataset.r);});
+  role('owner');
+
+  /* LeadBot: переключение мессенджера */
+  var MS={tg:['Telegram','Кнопка «Отправить номер»','8 (999) 123-45-67','В Telegram и MAX номер отправляется одной кнопкой.'],
+          vk:['VK','Номер текстом','+7 999 123 45 67','В VK такой кнопки нет, поэтому номер пишут текстом, а бот приводит его к одному виду.'],
+          max:['MAX','Кнопка «Отправить номер»','89991234567','В Telegram и MAX номер отправляется одной кнопкой.']};
+  $('msgr').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});var m=MS[b.dataset.m];$('adapter').textContent='адаптер: '+m[0];$('phoneStep').textContent=m[1];$('rawPhone').textContent=m[2];$('msgrNote').textContent=m[3];});
+
+  /* подбор решения */
+  var REC={
+    pay:['svc-pay','Бот записи и оплаты','Бот сам отправит реквизиты, примет чек и дважды напомнит об оплате. Менеджер только подтверждает оплату.'],
+    ai:['svc-ai','ИИ-ассистент в Telegram','Ассистент ответит на типовые вопросы по вашей базе в любое время, а сложные передаст менеджеру вместе с перепиской.'],
+    multi:['svc-multi','Бот заявок в Telegram, VK и MAX','Один сценарий на три мессенджера: заявки из всех каналов попадают в одну таблицу и сразу к менеджеру.'],
+    app:['svc-app','Telegram Mini App','Каталог с фильтрами и запись в пару касаний прямо в Telegram, без переписки и без скачивания приложения.'],
+    crm:['svc-crm','Система учёта для команды','Заявки, оплаты и переписки в одном месте: видно, кто с кем общался и на каком шаге клиент.'],
+    bi:['svc-bi','Аналитика для руководителя','Доходы и расходы по каждой группе, окупаемость рекламы и загрузка сотрудников без сводных таблиц.']
+  };
+  var res=$('res');
+  $('opts').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    Array.prototype.forEach.call(this.children,function(x){x.setAttribute('aria-pressed',x===b);});
+    var r=REC[b.dataset.k];res.className='res';res.innerHTML='';
+    res.appendChild(el('small',null,'Начать стоит с этого'));res.appendChild(el('h3',null,r[1]));res.appendChild(el('p',null,r[2]));
+    var a=el('a','btn','Посмотреть услугу');a.href='#'+r[0];a.onclick=function(){document.querySelectorAll('.s.lit').forEach(function(x){x.classList.remove('lit');});var s=document.getElementById(r[0]);s.classList.add('lit');setTimeout(function(){s.classList.remove('lit');},2600);};
+    res.appendChild(a);
+  });
+})();
+</script>
+</body>
+</html>

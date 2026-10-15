@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="LeadBot: демо бота заявок для Telegram, VK и MAX">
+<meta property="og:description" content="Пройдите диалог в браузере: выбор темы, имя, телефон, файл в ответ и заявка менеджеру.">
+</head>
+<body>
+<title>LeadBot демо</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Слева «телефон» с чатом в стиле мессенджера, справа то, что видит заказчик: заявки и уведомление */
+:root{
+  --bg:#eef1f5; --card:#ffffff; --ink:#1b2430; --muted:#5f6b7b; --line:#dde3ea;
+  --pressed-bg:#1b2430; --pressed-fg:#ffffff; --frame:#1b2430;
+  --notify-bg:#eef5ff; --notify-line:#3390ec;
+  --ok:#2f8a57; --radius:16px;
+  --chat-ink:#1b2430; --chat-muted:#6b7686;
+  --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161c; --card:#1b2129; --ink:#e7ebf0; --muted:#9aa5b3; --line:#2c3440;
+  --pressed-bg:#e7ebf0; --pressed-fg:#12161c; --frame:#05070a;
+  --notify-bg:#18263a; --notify-line:#5aa6f5; --ok:#3aa36a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161c; --card:#1b2129; --ink:#e7ebf0; --muted:#9aa5b3; --line:#2c3440;
+  --pressed-bg:#e7ebf0; --pressed-fg:#12161c; --frame:#05070a;
+  --notify-bg:#18263a; --notify-line:#5aa6f5; --ok:#3aa36a; color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.4;padding-block:24px 40px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.wrap{max-width:1020px;margin:0 auto}
+header.top{margin-bottom:18px}
+header.top h1{font-size:22px;margin-bottom:4px;text-wrap:balance}
+header.top p{color:var(--muted);font-size:14px;max-width:640px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px}
+.seg button{border:0;background:none;font:inherit;font-size:14px;padding:7px 12px;border-radius:9px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--pressed-bg);color:var(--pressed-fg)}
+.seg button:focus-visible,.reset:focus-visible,select:focus-visible{outline:2px solid var(--notify-line);outline-offset:2px}
+select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.layout{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+.layout>*{min-width:0}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+@media (max-width:820px){.layout{grid-template-columns:1fr}}
+
+/* Телефон */
+.phone{--accent:#3390ec;--head-bg:#fff;--head-ink:#1b2430;--chat-bg:#c8d9b8;--in:#fff;--out:#e1fec6;--btn-bg:rgba(0,0,0,.18);--btn-ink:#fff;
+  background:var(--chat-bg);color:var(--chat-ink);border-radius:28px;overflow:hidden;border:8px solid var(--frame);height:680px;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(20,30,50,.18);max-width:380px;width:100%;margin:0 auto}
+.phone[data-p="tg"]{--accent:#3390ec;--head-bg:#fff;--chat-bg:linear-gradient(160deg,#c6d8a8,#8fb78f);--in:#fff;--out:#e1fec6;--btn-bg:rgba(30,60,30,.32);--btn-ink:#fff}
+.phone[data-p="vk"]{--accent:#0077ff;--head-bg:#fff;--chat-bg:#ebedf0;--in:#fff;--out:#cce4ff;--btn-bg:#0077ff;--btn-ink:#fff}
+.phone[data-p="max"]{--accent:#6b4dff;--head-bg:#fff;--chat-bg:linear-gradient(170deg,#efeaff,#dfe9ff);--in:#fff;--out:#e3dcff;--btn-bg:#fff;--btn-ink:#6b4dff}
+.chat-head{background:var(--head-bg);display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06)}
+.ava{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+.chat-head b{display:block;font-size:15px}
+.chat-head small{color:var(--chat-muted);font-size:12px}
+.chat-head .net{margin-left:auto;font-size:11px;font-weight:700;color:var(--accent);border:1.5px solid var(--accent);border-radius:6px;padding:2px 6px}
+.msgs{flex:1;overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:6px}
+.msg{max-width:85%;display:flex;flex-direction:column;gap:4px}
+.msg.bot{align-self:flex-start}
+.msg.me{align-self:flex-end}
+.bubble{background:var(--in);padding:8px 11px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word;box-shadow:0 1px 1px rgba(0,0,0,.08);font-size:14px}
+.msg.me .bubble{background:var(--out)}
+.bubble a{color:var(--accent)}
+.file{display:flex;gap:10px;align-items:center;text-decoration:none;color:inherit;margin-bottom:6px}
+.file i{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;flex:none}
+.file span{font-weight:600;font-size:14px}
+.file small{display:block;color:var(--chat-muted);font-weight:400;font-size:12px}
+.ikb{display:flex;flex-direction:column;gap:4px}
+.ikb button{border:0;background:var(--btn-bg);color:var(--btn-ink);font:inherit;font-size:14px;font-weight:500;padding:8px;border-radius:10px;cursor:pointer}
+.phone[data-p="max"] .ikb button{box-shadow:inset 0 0 0 1.5px #d6ccff}
+.ikb button:disabled{opacity:.55;cursor:default}
+.typing{align-self:flex-start;background:var(--in);border-radius:14px;padding:8px 12px;color:var(--chat-muted);font-size:13px}
+.bottom{background:var(--head-bg);border-top:1px solid rgba(0,0,0,.06);padding:8px}
+.contact-btn{width:100%;border:0;background:var(--accent);color:#fff;font:inherit;font-weight:600;padding:10px;border-radius:10px;cursor:pointer;margin-bottom:8px}
+.hint{font-size:12px;color:var(--chat-muted);text-align:center;margin-bottom:6px}
+form.input{display:flex;gap:6px}
+form.input input{flex:1;min-width:0;background:#fff;color:var(--chat-ink);color-scheme:light;border:1px solid #dde3ea;border-radius:20px;padding:9px 14px;font:inherit;font-size:14px;outline:none}
+form.input input:focus{border-color:var(--accent)}
+form.input button{border:0;background:var(--accent);color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:16px}
+
+/* Панель справа */
+.panel{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.card h2{font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card h2 .count{background:var(--ok);color:#fff;border-radius:20px;font-size:12px;padding:1px 8px}
+.card p,.card li{font-size:14px;color:var(--muted)}
+.card ul{padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.leads{width:100%;border-collapse:collapse;font-size:13px}
+.leads th{text-align:left;color:var(--muted);font-weight:500;border-bottom:1px solid var(--line);padding:6px 4px}
+.leads td{padding:7px 4px;border-bottom:1px solid var(--line)}
+.tag{font-size:11px;font-weight:700;border-radius:5px;padding:1px 5px;color:#fff}
+.tag.tg{background:#3390ec}.tag.vk{background:#0077ff}.tag.max{background:#6b4dff}
+.empty{color:var(--muted);font-size:14px}
+.notify{background:var(--notify-bg);border-left:3px solid var(--notify-line);border-radius:8px;padding:10px 12px;font-size:13px;white-space:pre-wrap;margin-top:10px}
+.reset{border:1px solid var(--line);background:var(--card);font:inherit;font-size:13px;padding:6px 12px;border-radius:9px;cursor:pointer;color:var(--muted)}
+.table-scroll{overflow-x:auto}
+</style>
+<div class="wrap">
+  <header class="top">
+    <h1>Бот для сбора заявок: Telegram · VK · MAX</h1>
+    <p>Интерактивное демо: пройдите путь клиента. Бот спрашивает имя и телефон и в ответ присылает файл, а заявка сразу попадает в таблицу и менеджеру. Сценарий во всех мессенджерах общий.</p>
+  </header>
+
+  <div class="controls">
+    <div class="seg" id="platforms" role="group" aria-label="Мессенджер">
+      <button data-p="tg" aria-pressed="true">Telegram</button>
+      <button data-p="vk" aria-pressed="false">VK</button>
+      <button data-p="max" aria-pressed="false">MAX</button>
+    </div>
+    <div class="seg" id="modes" role="group" aria-label="Вариант">
+      <button data-m="multi" aria-pressed="true">Один бот + выбор темы</button>
+      <button data-m="single" aria-pressed="false">Бот на направление</button>
+    </div>
+    <select id="single-topic" hidden aria-label="Направление бота"></select>
+    <button class="reset" id="reset">↺ Начать заново</button>
+  </div>
+
+  <div class="layout">
+    <div class="phone" id="phone" data-p="tg">
+      <div class="chat-head">
+        <div class="ava">LB</div>
+        <div><b>LeadBot</b><small>бот</small></div>
+        <span class="net" id="net">TG</span>
+      </div>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <div class="bottom">
+        <button class="contact-btn" id="contact" hidden>📱 Отправить номер</button>
+        <div class="hint" id="hint" hidden></div>
+        <form class="input" id="form">
+          <input id="text" placeholder="Сообщение" autocomplete="off">
+          <button aria-label="Отправить">➤</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="card">
+        <h2>Заявки <span class="count" id="count">0</span></h2>
+        <div id="leads-box"><p class="empty">Пока пусто. Пройдите диалог слева, и здесь появится заявка.</p></div>
+        <div id="notify"></div>
+      </div>
+      <div class="card">
+        <h2>Что умеет</h2>
+        <ul>
+          <li>Одна логика на три мессенджера, поэтому правки сразу появляются везде</li>
+          <li>Оба варианта: один бот с выбором темы или отдельный бот на каждое направление</li>
+          <li>Номер кнопкой в Telegram и MAX; в VK такой кнопки нет, номер пишут текстом</li>
+          <li>Проверяет имя и телефон, номер приводит к виду +7…</li>
+          <li>Тот, кто уже оставил контакты, получает следующий файл сразу</li>
+          <li>Заявки сохраняются в таблицу и приходят менеджеру в Telegram</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// ===== Общее ядро: тот же код, что работает в боте (src/core) =====
+// Приводит номер к виду +79991234567. Возвращает null, если номер не похож на настоящий.
+function normalizePhone(raw) {
+  if (!raw) return null;
+  const hasPlus = String(raw).trim().startsWith('+');
+  let digits = String(raw).replace(/\D/g, '');
+
+  if (digits.length === 11 && digits.startsWith('8')) digits = '7' + digits.slice(1);
+  if (digits.length === 10 && digits.startsWith('9')) digits = '7' + digits;
+
+  if (digits.length === 11 && digits.startsWith('7')) return '+' + digits;
+  // Иностранные номера: E.164 допускает до 15 цифр
+  if (hasPlus && digits.length >= 10 && digits.length <= 15) return '+' + digits;
+  return null;
+}
+
+function normalizeName(raw) {
+  const name = String(raw ?? '').trim().replace(/\s+/g, ' ');
+  if (name.length < 2 || name.length > 50) return null;
+  if (!/^[\p{L}][\p{L}\s'-]*$/u.test(name)) return null;
+  return name[0].toUpperCase() + name.slice(1);
+}
+
+// Общая логика бота. Не знает ничего про Telegram/VK/MAX:
+// принимает нормализованное событие и возвращает список ответов,
+// которые адаптер платформы уже превращает в сообщения.
+//
+// Событие:  { type: 'start' } | { type: 'text', text } | { type: 'button', data } | { type: 'contact', phone }
+// Ответ:    { text, buttons?: [[{ text, data }]], requestContact?, removeKeyboard?, file?: { path, name } }
+
+
+
+const STEP = {
+  TOPIC: 'topic',
+  NAME: 'name',
+  PHONE: 'phone',
+  DONE: 'done',
+};
+
+function createScenario({ topics, defaultTopicId = null, privacyUrl, onLead, sessions = new Map() }) {
+  const topicById = new Map(topics.map((t) => [t.id, t]));
+
+  if (defaultTopicId && !topicById.has(defaultTopicId)) {
+    throw new Error(`DEFAULT_TOPIC="${defaultTopicId}" не найден в списке направлений`);
+  }
+
+  const topicButtons = () => topics.map((t) => [{ text: t.title, data: `topic:${t.id}` }]);
+  const moreButton = () => (defaultTopicId ? undefined : [[{ text: '📂 Получить другой материал', data: 'more' }]]);
+
+  function getSession(key) {
+    if (!sessions.has(key)) sessions.set(key, { step: null, topicId: null, name: null, phone: null });
+    return sessions.get(key);
+  }
+
+  function greet(session) {
+    const consent = `Продолжая, вы соглашаетесь на обработку персональных данных: ${privacyUrl}`;
+
+    if (defaultTopicId) {
+      session.topicId = defaultTopicId;
+      return askContactsOrSend(session, `Здравствуйте! 👋\nЯ пришлю вам материал «${topicById.get(defaultTopicId).fileName}».\n\n${consent}`);
+    }
+
+    session.step = STEP.TOPIC;
+    return [{
+      text: `Здравствуйте! 👋\nВыберите направление — пришлю полезный материал бесплатно.\n\n${consent}`,
+      buttons: topicButtons(),
+    }];
+  }
+
+  // Если контакты уже есть (человек берёт второй файл) — не спрашиваем повторно.
+  function askContactsOrSend(session, intro) {
+    const head = intro ? [{ text: intro }] : [];
+    if (session.name && session.phone) return [...head, ...sendFile(session)];
+    session.step = STEP.NAME;
+    return [...head, { text: 'Как к вам обращаться? Напишите имя.' }];
+  }
+
+  async function finish(session, key) {
+    session.step = STEP.DONE;
+    const topic = topicById.get(session.topicId);
+    await onLead?.({
+      platform: key.split(':')[0],
+      userId: key.split(':').slice(1).join(':'),
+      name: session.name,
+      phone: session.phone,
+      topic: topic.id,
+      createdAt: new Date().toISOString(),
+    });
+    return [
+      { text: `Спасибо, ${session.name}! Отправляю материал 👇`, removeKeyboard: true },
+      ...sendFile(session),
+    ];
+  }
+
+  function sendFile(session) {
+    session.step = STEP.DONE;
+    const topic = topicById.get(session.topicId);
+    return [{
+      text: topic.caption,
+      file: { path: topic.file, name: topic.fileName },
+      buttons: moreButton(),
+    }];
+  }
+
+  async function acceptPhone(session, key, raw) {
+    const phone = normalizePhone(raw);
+    if (!phone) {
+      return [{ text: 'Не получилось распознать номер 🙈 Напишите в формате +7 999 123-45-67.', requestContact: true }];
+    }
+    session.phone = phone;
+    return finish(session, key);
+  }
+
+  // key — уникальный id диалога, например "tg:12345" или "vk:678".
+  async function handle(key, event) {
+    const session = getSession(key);
+
+    if (event.type === 'start') return greet(session);
+
+    if (event.type === 'button') {
+      if (event.data === 'more') {
+        session.step = STEP.TOPIC;
+        return [{ text: 'Какое направление интересует?', buttons: topicButtons() }];
+      }
+      if (event.data.startsWith('topic:')) {
+        const topic = topicById.get(event.data.slice('topic:'.length));
+        if (!topic) return greet(session);
+        session.topicId = topic.id;
+        return askContactsOrSend(session, `Отлично, «${topic.title.replace(/^\S+\s/, '')}» ✅`);
+      }
+      return greet(session);
+    }
+
+    if (event.type === 'contact') {
+      if (session.step !== STEP.PHONE) return [{ text: 'Номер получил, но сейчас он не нужен 🙂 Нажмите /start, чтобы начать.' }];
+      return acceptPhone(session, key, event.phone);
+    }
+
+    // Обычный текст
+    switch (session.step) {
+      case STEP.NAME: {
+        const name = normalizeName(event.text);
+        if (!name) return [{ text: 'Напишите, пожалуйста, имя буквами — например, «Анна».' }];
+        session.name = name;
+        session.step = STEP.PHONE;
+        return [{
+          text: `Приятно познакомиться, ${name}! Оставьте номер телефона — нажмите кнопку ниже или напишите его сообщением.`,
+          requestContact: true,
+        }];
+      }
+      case STEP.PHONE:
+        return acceptPhone(session, key, event.text);
+      case STEP.TOPIC:
+        return [{ text: 'Выберите направление кнопкой ниже 👇', buttons: topicButtons() }];
+      default:
+        return greet(session);
+    }
+  }
+
+  return { handle };
+}
+
+
+const topics = [
+  {
+    "id": "marketing",
+    "title": "📈 Маркетинг",
+    "fileName": "Чек-лист по маркетингу.pdf",
+    "caption": "Чек-лист: 12 шагов, чтобы запустить рекламу без слива бюджета.",
+    "file": ""
+  },
+  {
+    "id": "sales",
+    "title": "🤝 Продажи",
+    "fileName": "Скрипты продаж.pdf",
+    "caption": "Готовые скрипты для первого звонка и работы с возражениями.",
+    "file": ""
+  },
+  {
+    "id": "hr",
+    "title": "👥 Найм",
+    "fileName": "Гайд по найму.pdf",
+    "caption": "Гайд: как найти и удержать сильного сотрудника.",
+    "file": ""
+  }
+];
+
+// ===== Демо-обвязка =====
+const PLATFORM = { tg: 'TG', vk: 'VK', max: 'MAX' };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const linkify = (s) => esc(s).replace(/https?:\/\/\S+/g, (u) => `<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
+
+let platform = 'tg';
+let mode = 'multi';
+let singleTopic = topics[0].id;
+let scenario, chats, leads, pending;
+
+const sel = $('single-topic');
+sel.innerHTML = topics.map((t) => `<option value="${t.id}">${esc(t.title)}</option>`).join('');
+
+function boot() {
+  leads = [];
+  chats = { tg: [], vk: [], max: [] };
+  pending = { tg: null, vk: null, max: null };
+  scenario = createScenario({
+    topics,
+    defaultTopicId: mode === 'single' ? singleTopic : null,
+    privacyUrl: 'https://example.com/privacy',
+    onLead: (lead) => { leads.push(lead); renderLeads(); },
+  });
+  renderLeads();
+  $('notify').innerHTML = '';
+  for (const p of Object.keys(chats)) send(p, { type: 'start' }, '/start');
+  render();
+}
+
+async function send(p, event, label) {
+  if (label) chats[p].push({ who: 'me', text: label });
+  // Кнопки прошлых сообщений гасим, как в настоящем мессенджере после выбора
+  chats[p].forEach((m) => { if (m.buttons) m.used = true; });
+  pending[p] = 'typing';
+  if (p === platform) render();
+  const replies = await scenario.handle(`${p}:demo`, event);
+  for (const r of replies) {
+    await new Promise((res) => setTimeout(res, 450));
+    chats[p].push({ who: 'bot', ...r });
+    if (p === platform) render();
+  }
+  pending[p] = null;
+  if (p === platform) render();
+}
+
+function render() {
+  const box = $('msgs');
+  const msgs = chats[platform];
+  box.innerHTML = msgs.map((m, i) => {
+    if (m.who === 'me') return `<div class="msg me"><div class="bubble">${esc(m.text)}</div></div>`;
+    const file = m.file ? `<div class="file"><i>PDF</i><span>${esc(m.file.name)}<small>файл от бота</small></span></div>` : '';
+    const kb = m.buttons ? `<div class="ikb">${m.buttons.flat().map((b) => `<button data-i="${i}" data-d="${b.data}" ${m.used ? 'disabled' : ''}>${esc(b.text)}</button>`).join('')}</div>` : '';
+    return `<div class="msg bot"><div class="bubble">${file}${linkify(m.text)}</div>${kb}</div>`;
+  }).join('') + (pending[platform] ? '<div class="typing">LeadBot печатает…</div>' : '');
+  const last = [...msgs].reverse().find((m) => m.who === 'bot');
+  const wantsContact = !!last?.requestContact && !pending[platform];
+  $('contact').hidden = !(wantsContact && platform !== 'vk');
+  $('hint').hidden = !(wantsContact && platform === 'vk');
+  $('hint').textContent = 'В VK нет кнопки «Поделиться номером», поэтому номер пишут сообщением';
+  box.scrollTop = box.scrollHeight;
+}
+
+function renderLeads() {
+  $('count').textContent = leads.length;
+  if (!leads.length) {
+    $('leads-box').innerHTML = '<p class="empty">Пока пусто. Пройдите диалог слева, и здесь появится заявка.</p>';
+    return;
+  }
+  const title = (id) => topics.find((t) => t.id === id).title;
+  $('leads-box').innerHTML = `<div class="table-scroll"><table class="leads"><thead><tr><th>Откуда</th><th>Имя</th><th>Телефон</th><th>Тема</th><th>Время</th></tr></thead><tbody>${
+    leads.map((l) => `<tr><td><span class="tag ${l.platform}">${PLATFORM[l.platform]}</span></td><td>${esc(l.name)}</td><td>${l.phone}</td><td>${esc(title(l.topic))}</td><td>${new Date(l.createdAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</td></tr>`).join('')
+  }</tbody></table></div>`;
+  const l = leads.at(-1);
+  $('notify').innerHTML = `<div class="notify"><b>Сообщение менеджеру в Telegram:</b>\n🆕 Новая заявка\nИмя: ${esc(l.name)}\nТелефон: ${l.phone}\nНаправление: ${esc(title(l.topic))}\nОткуда: ${PLATFORM[l.platform]}</div>`;
+}
+
+$('msgs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.ikb button');
+  if (!btn || btn.disabled || pending[platform]) return;
+  send(platform, { type: 'button', data: btn.dataset.d }, btn.textContent);
+});
+
+$('contact').addEventListener('click', () => {
+  if (pending[platform]) return;
+  send(platform, { type: 'contact', phone: '+79991234567' }, '📱 Контакт: +7 999 123-45-67');
+});
+
+$('form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const text = $('text').value.trim();
+  if (!text || pending[platform]) return;
+  $('text').value = '';
+  const event = text === '/start' ? { type: 'start' } : { type: 'text', text };
+  send(platform, event, text);
+});
+
+$('platforms').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  platform = b.dataset.p;
+  document.querySelectorAll('#platforms button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+  $('phone').dataset.p = platform;
+  $('net').textContent = PLATFORM[platform];
+  render();
+});
+
+$('modes').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  mode = b.dataset.m;
+  document.querySelectorAll('#modes button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+  sel.hidden = mode !== 'single';
+  boot();
+});
+
+sel.addEventListener('change', () => { singleTopic = sel.value; boot(); });
+$('reset').addEventListener('click', boot);
+
+boot();
+</script>
+
+</body></html>
